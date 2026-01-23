@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <!-- ========================================================================
+       THÔNG TIN PACKAGE CƠ BẢN
+       ======================================================================== -->
+  <name>mecanum_robot_bringup</name>
+  <version>1.0.0</version>
+  <description>Mecanum robot with dual lidar navigation</description>
+  <maintainer email="doanha1k12@gmail.com">dcd</maintainer>
+  <license>MIT</license>
+
+  <!-- ========================================================================
+       BUILD TOOL - ĐÃ ĐỔI SANG PYTHON
+       ======================================================================== -->
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <!-- ========================================================================
+       ROS2 CORE DEPENDENCIES
+       ======================================================================== -->
+  <depend>rclpy</depend>
+  <depend>sensor_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>std_msgs</depend>
+
+  <!-- ========================================================================
+       TF2 DEPENDENCIES
+       ======================================================================== -->
+  <depend>tf2_ros</depend>
+  <depend>tf2_geometry_msgs</depend>
+
+  <!-- ========================================================================
+       HARDWARE DRIVERS
+       ======================================================================== -->
+  <depend>rplidar_ros</depend>
+  <depend>robot_state_publisher</depend>
+
+  <!-- ========================================================================
+       SLAM & NAVIGATION STACK
+       ======================================================================== -->
+  <depend>slam_toolbox</depend>
+  <depend>navigation2</depend>
+  <depend>nav2_bringup</depend>
+  <depend>nav2_common</depend>
+
+  <!-- ========================================================================
+       URDF TOOLS
+       ======================================================================== -->
+  <depend>xacro</depend>
+  <depend>joint_state_publisher</depend>
+
+  <!-- ========================================================================
+       ROBOT_LOCALIZATION - Sensor Fusion
+       ======================================================================== -->
+  <depend>robot_localization</depend>
+
+  <!-- ========================================================================
+       PYTHON DEPENDENCIES
+       ======================================================================== -->
+  <exec_depend>python3-serial</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+
+  <!-- ========================================================================
+       EXPORT - ĐÃ ĐỔI BUILD TYPE
+       ======================================================================== -->
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

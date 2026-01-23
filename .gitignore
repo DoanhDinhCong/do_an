@@ -1,0 +1,12 @@
+# Bỏ qua các thư mục build của ROS
+build/
+devel/
+install/
+log/
+.catkin_workspace
+
+# Bỏ qua các file tạm của hệ thống và IDE
+.vscode/
+*.pyc
+*.swp
+*~
