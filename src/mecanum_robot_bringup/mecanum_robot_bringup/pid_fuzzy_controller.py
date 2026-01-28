@@ -135,7 +135,7 @@ class PidFuzzyController (Node ):
         self .declare_parameter ('map_frame','map')
         self .declare_parameter ('odom_frame','odom')
         self .declare_parameter ('base_frame','base_link')
-        self .declare_parameter ('scan_topic','/scan_360')
+        self .declare_parameter ('scan_topic','/scan_merged')
         self .declare_parameter ('plan_topic','/plan')
         self .declare_parameter ('cmd_vel_topic','/cmd_vel')
         self .declare_parameter ('goal_topic','/goal_pose')
