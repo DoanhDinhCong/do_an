@@ -1,44 +1,128 @@
 <?xml version="1.0"?>
 <!--
-mecanum_robot.urdf.xacro - FIXED VERSION
-FIX: Corrected nested link structure for lidar2
+mecanum_robot_detailed.urdf.xacro
+Kết hợp model chi tiết từ clb_mecanum vào cấu trúc mecanum_robot
 -->
 
-<robot name="mecanum_robot" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="mecanum_robot_detailed" xmlns:xacro="http://ros.org/wiki/xacro">
   
   <!-- ================================================================== -->
-  <!-- PROPERTIES -->
+  <!-- PROPERTIES - Từ File 1 (clb_mecanum) -->
   <!-- ================================================================== -->
   
-  <xacro:property name="base_length" value="0.48"/>
-  <xacro:property name="base_width" value="0.47"/>
-  <xacro:property name="base_height" value="0.15"/>
+  <!-- Wheel properties -->
+  <xacro:property name="wheel_radius" value="0.075"/>
+  <xacro:property name="wheel_core_radius" value="${wheel_radius}"/>
+  <xacro:property name="wheel_width" value="0.062"/>
+  <xacro:property name="wheel_mass" value="1.5"/>
+  
+  <!-- Base properties -->
+  <xacro:property name="lx" value="0.24"/>
+  <xacro:property name="ly" value="0.235"/>
+  <xacro:property name="base_len" value="0.76"/>
+  <xacro:property name="base_wid" value="0.53"/>
+  <xacro:property name="base_thk" value="0.20"/>
+  <xacro:property name="base_z" value="0.02"/>
+  <xacro:property name="base_corner_r" value="0.04"/>
   <xacro:property name="base_mass" value="20.0"/>
   
-  <xacro:property name="wheel_radius" value="0.075"/>
-  <xacro:property name="wheel_width" value="0.06"/>
-  <xacro:property name="wheel_mass" value="1.5"/>
-  <xacro:property name="wheel_separation_x" value="0.48"/>
-  <xacro:property name="wheel_separation_y" value="0.47"/>
+  <!-- Base geometry calculations -->
+  <xacro:property name="end_drop" value="0.05"/>
+  <xacro:property name="front_len" value="0.11"/>
+  <xacro:property name="rear_len" value="0.11"/>
+  <xacro:property name="mid_len" value="${base_len - front_len - rear_len}"/>
+  <xacro:property name="mid_x" value="${(rear_len - front_len)/2.0}"/>
+  <xacro:property name="lower_h" value="${base_thk - end_drop}"/>
+  <xacro:property name="lower_z" value="${base_z + lower_h/2.0}"/>
+  <xacro:property name="upper_h" value="${end_drop}"/>
+  <xacro:property name="upper_z" value="${base_z + lower_h + upper_h/2.0}"/>
   
-  <xacro:property name="lidar_height" value="0.08"/>
-  <xacro:property name="imu_height" value="0.05"/>
+  <!-- IMU properties -->
+  <xacro:property name="imu_x" value="0.0"/>
+  <xacro:property name="imu_y" value="0.0"/>
+  <xacro:property name="imu_z" value="${base_z + base_thk/2.0}"/>
+  <xacro:property name="imu_roll" value="0.0"/>
+  <xacro:property name="imu_pitch" value="0.0"/>
+  <xacro:property name="imu_yaw" value="0.0"/>
+  
+  <!-- Lidar properties -->
+  <xacro:property name="lidar_body_r" value="0.035"/>
+  <xacro:property name="lidar_body_h" value="0.03"/>
+  <xacro:property name="lidar_center_z" value="0.05"/>
+  <xacro:property name="lidar_plate_r" value="0.045"/>
+  <xacro:property name="lidar_plate_w" value="${lidar_plate_r * 2.0}"/>
+  <xacro:property name="lidar_plate_len" value="0.10"/>
+  <xacro:property name="lidar_plate_h" value="0.005"/>
+  <xacro:property name="lidar_plate_box_x" value="${lidar_plate_len/2.0 - lidar_plate_r}"/>
+  <xacro:property name="lidar_plate_cap_x" value="${-lidar_plate_r}"/>
+  <xacro:property name="lidar_plate_shift_x" value="${-lidar_plate_cap_x}"/>
+  <xacro:property name="lidar_plate_z" value="${base_z + lidar_plate_h/2.0}"/>
+  <xacro:property name="lidar_body_offset_z" value="${lidar_center_z - lidar_plate_z}"/>
+  <xacro:property name="lidar_post_r" value="0.003"/>
+  <xacro:property name="lidar_post_xy" value="0.02"/>
+  <xacro:property name="lidar_post_h" value="${lidar_center_z - lidar_body_h/2.0 - (base_z + lidar_plate_h)}"/>
+  <xacro:property name="lidar_post_z" value="${lidar_plate_h/2.0 + lidar_post_h/2.0}"/>
+  <xacro:property name="lidar_mount_x" value="0.42"/>
+  <xacro:property name="lidar_mount_y" value="0.29"/>
+  
+  <xacro:property name="lidar1_x" value="${lidar_mount_x}"/>
+  <xacro:property name="lidar1_y" value="${lidar_mount_y}"/>
+  <xacro:property name="lidar1_yaw" value="3.141592653589793"/>
+  
+  <xacro:property name="lidar2_x" value="${-lidar_mount_x}"/>
+  <xacro:property name="lidar2_y" value="${-lidar_mount_y}"/>
+  <xacro:property name="lidar2_yaw" value="0.0"/>
+  <xacro:property name="lidar_mount_yaw_front" value="3.769911"/>
+  <xacro:property name="lidar_mount_yaw_rear" value="0.628319"/>
+  
+  <!-- Math constants -->
+  <xacro:property name="pi_const" value="3.141592653589793"/>
+  <xacro:property name="pi_2" value="${pi_const/2.0}"/>
+  <xacro:property name="pi_4" value="${pi_const/4.0}"/>
+  <xacro:property name="pi_12" value="${pi_const/12.0}"/>
+  
+  <!-- Mecanum roller properties -->
+  <xacro:property name="roller_radius" value="0.0104"/>
+  <xacro:property name="roller_length" value="${wheel_width * 0.68}"/>
+  <xacro:property name="roller_offset" value="${wheel_radius - roller_radius + 0.003}"/>
+  <xacro:property name="roller_diag" value="${roller_offset * 0.7071}"/>
+  <xacro:property name="wheel_hub_radius" value="0.02"/>
+  <xacro:property name="wheel_hub_len" value="${wheel_width * 0.4}"/>
+  <xacro:property name="spoke_len" value="${wheel_core_radius * 1.4}"/>
+  <xacro:property name="spoke_wid" value="${wheel_radius * 0.20}"/>
+  <xacro:property name="spoke_thk" value="${wheel_width * 0.18}"/>
 
 
   <!-- ================================================================== -->
   <!-- MATERIALS -->
   <!-- ================================================================== -->
   
-  <material name="blue">
-    <color rgba="0.2 0.2 0.8 1.0"/>
+  <material name="orange">
+    <color rgba="1.0 0.45 0.0 1.0"/>
+  </material>
+  
+  <material name="blue_dark">
+    <color rgba="0.05 0.2 0.6 1.0"/>
   </material>
   
   <material name="black">
-    <color rgba="0.1 0.1 0.1 1.0"/>
+    <color rgba="0.05 0.05 0.05 1.0"/>
+  </material>
+  
+  <material name="copper">
+    <color rgba="0.72 0.45 0.2 1.0"/>
+  </material>
+  
+  <material name="gray">
+    <color rgba="0.5 0.5 0.5 1.0"/>
   </material>
   
   <material name="white">
-    <color rgba="0.9 0.9 0.9 1.0"/>
+    <color rgba="1.0 1.0 1.0 1.0"/>
+  </material>
+  
+  <material name="blue">
+    <color rgba="0.2 0.2 0.8 1.0"/>
   </material>
   
   <material name="red">
@@ -48,186 +132,265 @@ FIX: Corrected nested link structure for lidar2
   <material name="green">
     <color rgba="0.2 0.8 0.2 1.0"/>
   </material>
-  
-  <material name="orange">
-    <color rgba="1.0 0.5 0.0 1.0"/>
-  </material>
 
 
   <!-- ================================================================== -->
-  <!-- BASE_LINK -->
+  <!-- MACROS - Từ File 1 -->
+  <!-- ================================================================== -->
+  
+  <!-- Rounded box visual macro -->
+  <xacro:macro name="rounded_box_visual" params="length width height x y z r material_name">
+    <visual>
+      <origin xyz="${x} ${y} ${z}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${length - 2*r} ${width - 2*r} ${height}"/>
+      </geometry>
+      <material name="${material_name}"/>
+    </visual>
+    <visual>
+      <origin xyz="${x} ${y + width/2.0 - r} ${z}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${length - 2*r} ${2*r} ${height}"/>
+      </geometry>
+      <material name="${material_name}"/>
+    </visual>
+    <visual>
+      <origin xyz="${x} ${y - width/2.0 + r} ${z}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${length - 2*r} ${2*r} ${height}"/>
+      </geometry>
+      <material name="${material_name}"/>
+    </visual>
+    <visual>
+      <origin xyz="${x + length/2.0 - r} ${y} ${z}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${2*r} ${width - 2*r} ${height}"/>
+      </geometry>
+      <material name="${material_name}"/>
+    </visual>
+    <visual>
+      <origin xyz="${x - length/2.0 + r} ${y} ${z}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${2*r} ${width - 2*r} ${height}"/>
+      </geometry>
+      <material name="${material_name}"/>
+    </visual>
+    <visual>
+      <origin xyz="${x + length/2.0 - r} ${y + width/2.0 - r} ${z}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${r}" length="${height}"/>
+      </geometry>
+      <material name="${material_name}"/>
+    </visual>
+    <visual>
+      <origin xyz="${x + length/2.0 - r} ${y - width/2.0 + r} ${z}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${r}" length="${height}"/>
+      </geometry>
+      <material name="${material_name}"/>
+    </visual>
+    <visual>
+      <origin xyz="${x - length/2.0 + r} ${y + width/2.0 - r} ${z}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${r}" length="${height}"/>
+      </geometry>
+      <material name="${material_name}"/>
+    </visual>
+    <visual>
+      <origin xyz="${x - length/2.0 + r} ${y - width/2.0 + r} ${z}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${r}" length="${height}"/>
+      </geometry>
+      <material name="${material_name}"/>
+    </visual>
+  </xacro:macro>
+  
+  <!-- Roller macro -->
+  <xacro:macro name="roller" params="x z yaw tilt">
+    <visual>
+      <origin xyz="${x} 0 ${z}" rpy="1.57079632679 ${tilt} ${yaw}"/>
+      <geometry>
+        <cylinder radius="${roller_radius}" length="${roller_length}"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+  </xacro:macro>
+  
+  <!-- Roller at angle macro -->
+  <xacro:macro name="roller_at" params="angle tilt dir">
+    <xacro:roller x="${roller_offset * cos(angle * dir)}" 
+                  z="${roller_offset * sin(angle * dir)}" 
+                  yaw="${angle * dir}" 
+                  tilt="${tilt}"/>
+  </xacro:macro>
+  
+  <!-- Wheel spoke macro -->
+  <xacro:macro name="wheel_spoke" params="angle">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 ${angle} 0"/>
+      <geometry>
+        <box size="${spoke_len} ${spoke_thk} ${spoke_wid}"/>
+      </geometry>
+      <material name="gray"/>
+    </visual>
+  </xacro:macro>
+  
+  <!-- Mecanum wheel macro -->
+  <xacro:macro name="mecanum_wheel" params="link_name joint_name x y roller_tilt angle_dir">
+    <link name="${link_name}">
+      <!-- Wheel core -->
+      <visual>
+        <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+        <geometry>
+          <cylinder radius="${wheel_core_radius}" length="${wheel_width}"/>
+        </geometry>
+        <material name="blue_dark"/>
+      </visual>
+      
+      <!-- Wheel hub -->
+      <visual>
+        <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+        <geometry>
+          <cylinder radius="${wheel_hub_radius}" length="${wheel_hub_len}"/>
+        </geometry>
+        <material name="gray"/>
+      </visual>
+      
+      <!-- Spokes -->
+      <xacro:wheel_spoke angle="0"/>
+      <xacro:wheel_spoke angle="${pi_const/3.0}"/>
+      <xacro:wheel_spoke angle="${pi_const*2.0/3.0}"/>
+      <xacro:wheel_spoke angle="${pi_const}"/>
+      <xacro:wheel_spoke angle="${pi_const*4.0/3.0}"/>
+      <xacro:wheel_spoke angle="${pi_const*5.0/3.0}"/>
+      
+      <!-- Rollers - 12 rollers around the wheel -->
+      <xacro:roller_at angle="0" tilt="${roller_tilt}" dir="${angle_dir}"/>
+      <xacro:roller_at angle="${pi_12}" tilt="${roller_tilt}" dir="${angle_dir}"/>
+      <xacro:roller_at angle="${pi_12*2}" tilt="${roller_tilt}" dir="${angle_dir}"/>
+      <xacro:roller_at angle="${pi_12*3}" tilt="${roller_tilt}" dir="${angle_dir}"/>
+      <xacro:roller_at angle="${pi_12*4}" tilt="${roller_tilt}" dir="${angle_dir}"/>
+      <xacro:roller_at angle="${pi_12*5}" tilt="${roller_tilt}" dir="${angle_dir}"/>
+      <xacro:roller_at angle="${pi_12*6}" tilt="${roller_tilt}" dir="${angle_dir}"/>
+      <xacro:roller_at angle="${pi_12*7}" tilt="${roller_tilt}" dir="${angle_dir}"/>
+      <xacro:roller_at angle="${pi_12*8}" tilt="${roller_tilt}" dir="${angle_dir}"/>
+      <xacro:roller_at angle="${pi_12*9}" tilt="${roller_tilt}" dir="${angle_dir}"/>
+      <xacro:roller_at angle="${pi_12*10}" tilt="${roller_tilt}" dir="${angle_dir}"/>
+      <xacro:roller_at angle="${pi_12*11}" tilt="${roller_tilt}" dir="${angle_dir}"/>
+      
+      <!-- Collision -->
+      <collision>
+        <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+        <geometry>
+          <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        </geometry>
+      </collision>
+      
+      <!-- Inertial -->
+      <inertial>
+        <mass value="${wheel_mass}"/>
+        <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+        <inertia 
+          ixx="${(1/12) * wheel_mass * (3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"
+          iyy="${(1/12) * wheel_mass * (3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"
+          izz="${(1/2) * wheel_mass * wheel_radius*wheel_radius}"
+          ixy="0" ixz="0" iyz="0"/>
+      </inertial>
+    </link>
+    
+    <joint name="${joint_name}" type="continuous">
+      <parent link="base_link"/>
+      <child link="${link_name}"/>
+      <origin xyz="${x} ${y} ${wheel_radius}" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+      <dynamics damping="0.1" friction="0.1"/>
+    </joint>
+  </xacro:macro>
+
+
+  <!-- ================================================================== -->
+  <!-- BASE_LINK - Sử dụng rounded box từ File 1 -->
   <!-- ================================================================== -->
   
   <link name="base_link">
-    <visual>
-      <geometry>
-        <box size="0.8 0.52 ${base_height}"/>
-      </geometry>
-      <origin xyz="0 0 ${base_height/2 + 0.05}" rpy="0 0 0"/>
-      <material name="orange"/>
-    </visual>
+    <!-- Lower part of base -->
+    <xacro:rounded_box_visual 
+      length="${base_len}" 
+      width="${base_wid}" 
+      height="${lower_h}"
+      x="0" 
+      y="0" 
+      z="${lower_z}" 
+      r="${base_corner_r}"
+      material_name="orange"/>
     
+    <!-- Upper part of base -->
+    <xacro:rounded_box_visual 
+      length="${mid_len}" 
+      width="${base_wid}" 
+      height="${upper_h}"
+      x="${mid_x}" 
+      y="0" 
+      z="${upper_z}" 
+      r="${base_corner_r}"
+      material_name="orange"/>
+    
+    <!-- Collision -->
     <collision>
       <geometry>
-        <box size="${base_length} ${base_width} ${base_height}"/>
+        <box size="${base_len} ${base_wid} ${base_thk}"/>
       </geometry>
-      <origin xyz="0 0 ${base_height/2 + 0.05}" rpy="0 0 0"/>
+      <origin xyz="0 0 ${base_z + base_thk/2}" rpy="0 0 0"/>
     </collision>
     
+    <!-- Inertial -->
     <inertial>
       <mass value="${base_mass}"/>
-      <origin xyz="0 0 ${base_height/2 + 0.05 }" rpy="0 0 0"/>
+      <origin xyz="0 0 ${base_z + base_thk/2}" rpy="0 0 0"/>
       <inertia 
-        ixx="${(1/12) * base_mass * (base_width*base_width + base_height*base_height)}"
-        iyy="${(1/12) * base_mass * (base_length*base_length + base_height*base_height)}"
-        izz="${(1/12) * base_mass * (base_length*base_length + base_width*base_width)}"
+        ixx="${(1/12) * base_mass * (base_wid*base_wid + base_thk*base_thk)}"
+        iyy="${(1/12) * base_mass * (base_len*base_len + base_thk*base_thk)}"
+        izz="${(1/12) * base_mass * (base_len*base_len + base_wid*base_wid)}"
         ixy="0" ixz="0" iyz="0"/>
     </inertial>
   </link>
 
 
   <!-- ================================================================== -->
-  <!-- LIDAR 1 - Thân LiDAR -->
+  <!-- WHEELS - Sử dụng mecanum wheels chi tiết từ File 1 -->
   <!-- ================================================================== -->
   
-  <link name="lidar1_link">
-    <visual>
-      <geometry>
-        <cylinder radius="0.04" length="0.04"/>
-      </geometry>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <material name="black"/>
-    </visual>
-
-    <collision>
-      <geometry>
-        <cylinder radius="0.04" length="0.04"/>
-      </geometry>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-    </collision>
-    
-    <inertial>
-      <mass value="0.2"/>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia ixx="0.0001" iyy="0.0001" izz="0.0001" 
-               ixy="0" ixz="0" iyz="0"/>
-    </inertial>
-  </link>
+  <xacro:mecanum_wheel 
+    link_name="wheel_fl" 
+    joint_name="wheel_fl_joint" 
+    x="${lx}" 
+    y="${ly}" 
+    roller_tilt="${pi_4}" 
+    angle_dir="1"/>
   
-  <joint name="lidar1_joint" type="fixed">
-    <parent link="base_link"/>
-    <child link="lidar1_link"/>
-    <origin xyz="0.42 0.29 0.075" rpy="0 0 3.1456"/>
-  </joint>
-
-
-  <!-- ================================================================== -->
-  <!-- LIDAR 1 - Đế cam -->
-  <!-- ================================================================== -->
-
-  <link name="de_lidar1_link">
-    <visual>
-      <geometry>
-        <cylinder radius="0.05" length="0.002"/>
-      </geometry>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <material name="lidar1_base_orange">
-        <color rgba="1.0 0.5 0.0 1.0"/>
-      </material>
-    </visual>
-    
-    <collision>
-      <geometry>
-        <cylinder radius="0.05" length="0.002"/>
-      </geometry>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-    </collision>
-    
-    <inertial>
-      <mass value="0.01"/>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia ixx="0.00001" iyy="0.00001" izz="0.00001"
-               ixy="0" ixz="0" iyz="0"/>
-    </inertial>
-  </link>
-
-  <joint name="de_lidar1_joint" type="fixed">
-    <parent link="lidar1_link"/>
-    <child link="de_lidar1_link"/>
-    <origin xyz="0 0 -0.021" rpy="0 0 0"/>
-  </joint>
-
-
-  <!-- ================================================================== -->
-  <!-- LIDAR 2 - Thân LiDAR (✅ FIXED: Đóng đúng tag) -->
-  <!-- ================================================================== -->
+  <xacro:mecanum_wheel 
+    link_name="wheel_fr" 
+    joint_name="wheel_fr_joint" 
+    x="${lx}" 
+    y="${-ly}" 
+    roller_tilt="${-pi_4}" 
+    angle_dir="-1"/>
   
-  <link name="lidar2_link">
-    <visual>
-      <geometry>
-        <cylinder radius="0.04" length="0.04"/>
-      </geometry>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <material name="black"/>
-    </visual>
-
-    <collision>
-      <geometry>
-        <cylinder radius="0.04" length="0.04"/>
-      </geometry>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-    </collision>
-    
-    <inertial>
-      <mass value="0.2"/>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia ixx="0.0001" iyy="0.0001" izz="0.0001"
-               ixy="0" ixz="0" iyz="0"/>
-    </inertial>
-  </link>
+  <xacro:mecanum_wheel 
+    link_name="wheel_rr" 
+    joint_name="wheel_rr_joint" 
+    x="${-lx}" 
+    y="${-ly}" 
+    roller_tilt="${pi_4}" 
+    angle_dir="-1"/>
   
-  <joint name="lidar2_joint" type="fixed">
-    <parent link="base_link"/>
-    <child link="lidar2_link"/>
-    <origin xyz="-0.42 -0.29 0.075" rpy="0 0 0"/>
-  </joint>
-
-
-  <!-- ================================================================== -->
-  <!-- LIDAR 2 - Đế cam (✅ FIXED: Tách riêng ra ngoài) -->
-  <!-- ================================================================== -->
-  
-  <link name="de_lidar2_link">
-    <visual>
-      <geometry>
-        <cylinder radius="0.05" length="0.002"/>
-      </geometry>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <material name="lidar2_base_orange">
-        <color rgba="1.0 0.5 0.0 1.0"/>
-      </material>
-    </visual>
-    
-    <collision>
-      <geometry>
-        <cylinder radius="0.05" length="0.002"/>
-      </geometry>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-    </collision>
-    
-    <inertial>
-      <mass value="0.01"/>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia ixx="0.00001" iyy="0.00001" izz="0.00001"
-               ixy="0" ixz="0" iyz="0"/>
-    </inertial>
-  </link>
-
-  <joint name="de_lidar2_joint" type="fixed">
-    <parent link="lidar2_link"/>
-    <child link="de_lidar2_link"/>
-    <origin xyz="0 0 -0.021" rpy="0 0 0"/>
-  </joint>
+  <xacro:mecanum_wheel 
+    link_name="wheel_rl" 
+    joint_name="wheel_rl_joint" 
+    x="${-lx}" 
+    y="${ly}" 
+    roller_tilt="${-pi_4}" 
+    angle_dir="1"/>
 
 
   <!-- ================================================================== -->
@@ -236,189 +399,253 @@ FIX: Corrected nested link structure for lidar2
   
   <link name="imu_link">
     <visual>
-      <geometry>
-        <box size="0.05 0.04 0.02"/>
-      </geometry>
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <material name="blue"/>
+      <geometry>
+        <box size="0.06 0.04 0.02"/>
+      </geometry>
+      <material name="gray"/>
     </visual>
     
     <collision>
-      <geometry>
-        <box size="0.05 0.04 0.02"/>
-      </geometry>
       <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.06 0.04 0.02"/>
+      </geometry>
     </collision>
     
     <inertial>
       <mass value="0.05"/>
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia ixx="0.00001" iyy="0.00001" izz="0.00001"
-               ixy="0" ixz="0" iyz="0"/>
+      <inertia 
+        ixx="0.00001" 
+        iyy="0.00001" 
+        izz="0.00001"
+        ixy="0" ixz="0" iyz="0"/>
     </inertial>
   </link>
   
-  <joint name="imu_joint" type="fixed">
+  <joint name="imu_fixed" type="fixed">
     <parent link="base_link"/>
     <child link="imu_link"/>
-    <origin xyz="0 0 ${imu_height}" rpy="0 0 -1.57"/>
+    <origin xyz="${imu_x} ${imu_y} ${imu_z}" 
+            rpy="${imu_roll} ${imu_pitch} ${imu_yaw}"/>
   </joint>
 
 
   <!-- ================================================================== -->
-  <!-- WHEELS -->
+  <!-- LIDAR FRONT - Với mounting plate chi tiết -->
   <!-- ================================================================== -->
-
-  <!-- FRONT LEFT -->
-  <link name="wheel_fl_link">
+  
+  <link name="lidar_front_mount">
+    <!-- Mounting plate box -->
     <visual>
+      <origin xyz="${lidar_plate_box_x + lidar_plate_shift_x} 0 0" rpy="0 0 0"/>
       <geometry>
-        <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        <box size="${lidar_plate_len} ${lidar_plate_w} ${lidar_plate_h}"/>
       </geometry>
-      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
-      <material name="black"/>
+      <material name="orange"/>
     </visual>
     
-    <collision>
+    <!-- Mounting plate cap -->
+    <visual>
+      <origin xyz="${lidar_plate_cap_x + lidar_plate_shift_x} 0 0" rpy="0 0 0"/>
       <geometry>
-        <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        <cylinder radius="${lidar_plate_r}" length="${lidar_plate_h}"/>
       </geometry>
-      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
-    </collision>
+      <material name="orange"/>
+    </visual>
+    
+    <!-- Support posts -->
+    <visual>
+      <origin xyz="${lidar_post_xy} ${lidar_post_xy} ${lidar_post_z}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${lidar_post_r}" length="${lidar_post_h}"/>
+      </geometry>
+      <material name="copper"/>
+    </visual>
+    <visual>
+      <origin xyz="${-lidar_post_xy} ${lidar_post_xy} ${lidar_post_z}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${lidar_post_r}" length="${lidar_post_h}"/>
+      </geometry>
+      <material name="copper"/>
+    </visual>
+    <visual>
+      <origin xyz="${-lidar_post_xy} ${-lidar_post_xy} ${lidar_post_z}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${lidar_post_r}" length="${lidar_post_h}"/>
+      </geometry>
+      <material name="copper"/>
+    </visual>
+    <visual>
+      <origin xyz="${lidar_post_xy} ${-lidar_post_xy} ${lidar_post_z}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${lidar_post_r}" length="${lidar_post_h}"/>
+      </geometry>
+      <material name="copper"/>
+    </visual>
     
     <inertial>
-      <mass value="${wheel_mass}"/>
-      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <mass value="0.1"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <inertia 
-        ixx="${(1/12) * wheel_mass * (3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"
-        iyy="${(1/12) * wheel_mass * (3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"
-        izz="${(1/2) * wheel_mass * wheel_radius*wheel_radius}"
+        ixx="0.0001" 
+        iyy="0.0001" 
+        izz="0.0001"
         ixy="0" ixz="0" iyz="0"/>
     </inertial>
   </link>
-
-  <joint name="wheel_fl_joint" type="continuous">
+  
+  <joint name="lidar_front_mount_joint" type="fixed">
     <parent link="base_link"/>
-    <child link="wheel_fl_link"/>
-    <origin xyz="${wheel_separation_x/2} ${wheel_separation_y/2} ${wheel_radius}" rpy="0 0 0"/>
-    <axis xyz="0 1 0"/>
-    <dynamics damping="0.1" friction="0.1"/>
+    <child link="lidar_front_mount"/>
+    <origin xyz="${lidar1_x} ${lidar1_y} ${lidar_plate_z}" 
+            rpy="0 0 ${lidar_mount_yaw_front}"/>
   </joint>
-
-
-  <!-- FRONT RIGHT -->
-  <link name="wheel_fr_link">
+  
+  <link name="lidar_front">
     <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        <cylinder radius="${lidar_body_r}" length="${lidar_body_h}"/>
       </geometry>
-      <origin xyz="0 0 0" rpy="4.71239 0 0"/>
       <material name="black"/>
     </visual>
     
     <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        <cylinder radius="${lidar_body_r}" length="${lidar_body_h}"/>
       </geometry>
-      <origin xyz="0 0 0" rpy="4.71239 0 0"/>
     </collision>
     
     <inertial>
-      <mass value="${wheel_mass}"/>
-      <origin xyz="0 0 0" rpy="4.71239 0 0"/>
+      <mass value="0.2"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <inertia 
-        ixx="${(1/12) * wheel_mass * (3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"
-        iyy="${(1/12) * wheel_mass * (3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"
-        izz="${(1/2) * wheel_mass * wheel_radius*wheel_radius}"
+        ixx="0.0001" 
+        iyy="0.0001" 
+        izz="0.0001"
         ixy="0" ixz="0" iyz="0"/>
     </inertial>
   </link>
-
-  <joint name="wheel_fr_joint" type="continuous">
-    <parent link="base_link"/>
-    <child link="wheel_fr_link"/>
-    <origin xyz="${wheel_separation_x/2} ${-wheel_separation_y/2} ${wheel_radius}" rpy="0 0 0"/>
-    <axis xyz="0 1 0"/>
-    <dynamics damping="0.1" friction="0.1"/>
-  </joint>
-
-
-  <!-- REAR LEFT -->
-  <link name="wheel_rl_link">
-    <visual>
-      <geometry>
-        <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
-      </geometry>
-      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
-      <material name="black"/>
-    </visual>
-    
-    <collision>
-      <geometry>
-        <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
-      </geometry>
-      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
-    </collision>
-    
-    <inertial>
-      <mass value="${wheel_mass}"/>
-      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
-      <inertia 
-        ixx="${(1/12) * wheel_mass * (3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"
-        iyy="${(1/12) * wheel_mass * (3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"
-        izz="${(1/2) * wheel_mass * wheel_radius*wheel_radius}"
-        ixy="0" ixz="0" iyz="0"/>
-    </inertial>
-  </link>
-
-  <joint name="wheel_rl_joint" type="continuous">
-    <parent link="base_link"/>
-    <child link="wheel_rl_link"/>
-    <origin xyz="${-wheel_separation_x/2} ${wheel_separation_y/2} ${wheel_radius}" rpy="0 0 0"/>
-    <axis xyz="0 1 0"/>
-    <dynamics damping="0.1" friction="0.1"/>
-  </joint>
-
-
-  <!-- REAR RIGHT -->
-  <link name="wheel_rr_link">
-    <visual>
-      <geometry>
-        <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
-      </geometry>
-      <origin xyz="0 0 0" rpy="4.71239 0 0"/>
-      <material name="black"/>
-    </visual>
-    
-    <collision>
-      <geometry>
-        <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
-      </geometry>
-      <origin xyz="0 0 0" rpy="4.71239 0 0"/>
-    </collision>
-    
-    <inertial>
-      <mass value="${wheel_mass}"/>
-      <origin xyz="0 0 0" rpy="4.71239 0 0"/>
-      <inertia 
-        ixx="${(1/12) * wheel_mass * (3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"
-        iyy="${(1/12) * wheel_mass * (3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"
-        izz="${(1/2) * wheel_mass * wheel_radius*wheel_radius}"
-        ixy="0" ixz="0" iyz="0"/>
-    </inertial>
-  </link>
-
-  <joint name="wheel_rr_joint" type="continuous">
-    <parent link="base_link"/>
-    <child link="wheel_rr_link"/>
-    <origin xyz="${-wheel_separation_x/2} ${-wheel_separation_y/2} ${wheel_radius}" rpy="0 0 0"/>
-    <axis xyz="0 1 0"/>
-    <dynamics damping="0.1" friction="0.1"/>
+  
+  <joint name="lidar_front_joint" type="fixed">
+    <parent link="lidar_front_mount"/>
+    <child link="lidar_front"/>
+    <origin xyz="0 0 ${lidar_body_offset_z}" 
+            rpy="0 0 ${lidar1_yaw - lidar_mount_yaw_front}"/>
   </joint>
 
 
   <!-- ================================================================== -->
-  <!-- FRONT MARKER -->
+  <!-- LIDAR REAR - Với mounting plate chi tiết -->
+  <!-- ================================================================== -->
+  
+  <link name="lidar_rear_mount">
+    <!-- Mounting plate box -->
+    <visual>
+      <origin xyz="${lidar_plate_box_x + lidar_plate_shift_x} 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${lidar_plate_len} ${lidar_plate_w} ${lidar_plate_h}"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+    
+    <!-- Mounting plate cap -->
+    <visual>
+      <origin xyz="${lidar_plate_cap_x + lidar_plate_shift_x} 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${lidar_plate_r}" length="${lidar_plate_h}"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+    
+    <!-- Support posts -->
+    <visual>
+      <origin xyz="${lidar_post_xy} ${lidar_post_xy} ${lidar_post_z}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${lidar_post_r}" length="${lidar_post_h}"/>
+      </geometry>
+      <material name="copper"/>
+    </visual>
+    <visual>
+      <origin xyz="${-lidar_post_xy} ${lidar_post_xy} ${lidar_post_z}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${lidar_post_r}" length="${lidar_post_h}"/>
+      </geometry>
+      <material name="copper"/>
+    </visual>
+    <visual>
+      <origin xyz="${-lidar_post_xy} ${-lidar_post_xy} ${lidar_post_z}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${lidar_post_r}" length="${lidar_post_h}"/>
+      </geometry>
+      <material name="copper"/>
+    </visual>
+    <visual>
+      <origin xyz="${lidar_post_xy} ${-lidar_post_xy} ${lidar_post_z}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${lidar_post_r}" length="${lidar_post_h}"/>
+      </geometry>
+      <material name="copper"/>
+    </visual>
+    
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia 
+        ixx="0.0001" 
+        iyy="0.0001" 
+        izz="0.0001"
+        ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </link>
+  
+  <joint name="lidar_rear_mount_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="lidar_rear_mount"/>
+    <origin xyz="${lidar2_x} ${lidar2_y} ${lidar_plate_z}" 
+            rpy="0 0 ${lidar_mount_yaw_rear}"/>
+  </joint>
+  
+  <link name="lidar_rear">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${lidar_body_r}" length="${lidar_body_h}"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${lidar_body_r}" length="${lidar_body_h}"/>
+      </geometry>
+    </collision>
+    
+    <inertial>
+      <mass value="0.2"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia 
+        ixx="0.0001" 
+        iyy="0.0001" 
+        izz="0.0001"
+        ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </link>
+  
+  <joint name="lidar_rear_joint" type="fixed">
+    <parent link="lidar_rear_mount"/>
+    <child link="lidar_rear"/>
+    <origin xyz="0 0 ${lidar_body_offset_z}" 
+            rpy="0 0 ${lidar2_yaw - lidar_mount_yaw_rear}"/>
+  </joint>
+
+
+  <!-- ================================================================== -->
+  <!-- FRONT MARKER (từ File 2) -->
   <!-- ================================================================== -->
   
   <link name="front_marker">
@@ -434,7 +661,7 @@ FIX: Corrected nested link structure for lidar2
   <joint name="front_marker_joint" type="fixed">
     <parent link="base_link"/>
     <child link="front_marker"/>
-    <origin xyz="0.375 0 ${base_height + 0.06}" rpy="0 0 0"/>
+    <origin xyz="0.375 0 ${base_z + base_thk + 0.01}" rpy="0 0 0"/>
   </joint>
 
 </robot>

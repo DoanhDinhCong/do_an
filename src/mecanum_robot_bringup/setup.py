@@ -37,6 +37,7 @@ setup(
             'laser_scan_merger.py = mecanum_robot_bringup.laser_scan_merger:main',
             'hwt901b_driver.py = mecanum_robot_bringup.hwt901b_driver:main',
             'test_odometry_comparison.py = mecanum_robot_bringup.test_odometry_comparison:main',
+            'circle_path_gui.py = mecanum_robot_bringup.circle_path_gui:main',
         ],
     },
 )

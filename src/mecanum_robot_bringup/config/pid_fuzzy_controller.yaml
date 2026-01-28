@@ -1,0 +1,163 @@
+pid_fuzzy_controller:
+  ros__parameters:
+
+    # ==========================
+    # Frame & Topic
+    # ==========================
+    map_frame: map                          # Frame bản đồ toàn cục
+    odom_frame: odom                        # Frame odometry
+    base_frame: base_link                   # Frame thân robot
+
+    scan_topic: /scan_360                   # Topic LiDAR
+    plan_topic: /plan                      # Topic đường đi từ planner
+    cmd_vel_topic: /cmd_vel                # Topic xuất vận tốc điều khiển
+    goal_topic: /goal_pose                 # Topic goal nội bộ
+    rviz_goal_topic: /move_base_simple/goal  # Goal gửi từ RViz
+
+    planner_action: /compute_path_to_pose  # Action server của Nav2 planner
+    planner_id: GridBased                  # ID plugin planner (Nav2)
+    use_start: false                       # Không ép start pose khi gọi planner
+    publish_plan: true                     # Xuất lại plan ra topic
+    goal_auto_enable_topic: /goal_auto_enable  # Topic bật/tắt goal tự động
+
+
+    # ==========================
+    # Chế độ chạy hình tròn / hình học
+    # ==========================
+    circle_center_topic: /circle_center    # Tâm quỹ đạo tròn
+    circle_radius_topic: /circle_radius    # Bán kính quỹ đạo tròn
+    circle_direction_topic: /circle_direction  # Chiều quay (+1 / -1)
+    circle_loops_topic: /circle_loops      # Số vòng quay
+    circle_enable_topic: /circle_enable    # Bật/tắt chế độ chạy tròn
+    shape_type_topic: /shape_type          # Loại hình học (circle, line, …)
+    circle_plan_topic: /circle_plan        # Topic plan hình tròn
+
+    circle_ds: 0.10                        # Bước lấy mẫu quỹ đạo tròn (m)
+    circle_rejoin_dist: 0.20               # Ngưỡng nhập lại quỹ đạo (m)
+    circle_rejoin_lookahead: 1.00          # Lookahead khi nhập lại quỹ đạo (m)
+
+
+    # ==========================
+    # Tham số điều khiển quỹ đạo
+    # ==========================
+    control_rate_hz: 30.0                  # Tần số vòng điều khiển (Hz)
+    lookahead_dist: 0.5                    # Khoảng nhìn trước Pure Pursuit (m)
+    heading_mode: path                     # Kiểu heading: path | goal
+
+    goal_tolerance_xy: 0.25                # Sai số vị trí chấp nhận (m)
+    goal_tolerance_yaw: 0.45               # Sai số yaw chấp nhận (rad)
+
+
+    # ==========================
+    # Tự động replan & phát hiện kẹt
+    # ==========================
+    replan_timer_hz: 1.0                   # Tần số kiểm tra replan (Hz)
+    min_replan_interval: 0.4               # Khoảng tối thiểu giữa 2 lần replan (s)
+
+    blocked_check_dist: 1.2                # Độ dài kiểm tra vật cản phía trước (m)
+    blocked_num_points: 8                  # Số điểm liên tiếp coi là bị kẹt
+    blocked_margin: 0.2                    # Biên an toàn vật cản (m)
+
+    deviation_dist: 0.3                    # Lệch quỹ đạo cho phép (m)
+    deviation_time: 0.5                    # Thời gian lệch liên tục để coi là lỗi (s)
+
+    amcl_jump_dist: 0.3                    # Ngưỡng nhảy vị trí AMCL (m)
+    amcl_jump_yaw: 0.3                     # Ngưỡng nhảy yaw AMCL (rad)
+
+
+    # ==========================
+    # PID cơ bản
+    # ==========================
+    kp_x: 0.6                              # Hệ số P trục X
+    ki_x: 0.0                              # Hệ số I trục X
+    kd_x: 0.0                              # Hệ số D trục X
+
+    kp_y: 0.6                              # Hệ số P trục Y
+    ki_y: 0.0                              # Hệ số I trục Y
+    kd_y: 0.0                              # Hệ số D trục Y
+
+    kp_yaw: 0.8                            # Hệ số P yaw
+    ki_yaw: 0.0                            # Hệ số I yaw
+    kd_yaw: 0.1                            # Hệ số D yaw
+
+    integrator_limit: 0.5                  # Giới hạn tích phân (anti-windup)
+
+
+    # ==========================
+    # Giới hạn vận tốc & gia tốc
+    # ==========================
+    min_vel_x: -0.24                       # Vận tốc X nhỏ nhất (m/s)
+    max_vel_x: 0.24                        # Vận tốc X lớn nhất (m/s)
+
+    min_vel_y: -0.24                       # Vận tốc Y nhỏ nhất (m/s)
+    max_vel_y: 0.24                        # Vận tốc Y lớn nhất (m/s)
+
+    min_vel_theta: -0.50                   # Vận tốc góc nhỏ nhất (rad/s)
+    max_vel_theta: 0.50                    # Vận tốc góc lớn nhất (rad/s)
+
+    max_accel_x: 0.35                      # Gia tốc X tối đa (m/s²)
+    max_accel_y: 0.35                      # Gia tốc Y tối đa (m/s²)
+    max_accel_theta: 0.8                   # Gia tốc góc tối đa (rad/s²)
+
+
+    # ==========================
+    # Fuzzy PID – bật/tắt & thang đo
+    # ==========================
+    use_fuzzy_pid: true                    # Bật điều khiển fuzzy PID
+
+    fuzzy_e_max_xy: 0.50                   # Biên sai số XY tối đa
+    fuzzy_de_max_xy: 0.50                  # Biên đạo hàm sai số XY
+
+    fuzzy_e_max_yaw: 1.20                  # Biên sai số yaw
+    fuzzy_de_max_yaw: 1.20                 # Biên đạo hàm sai số yaw
+
+    fuzzy_kp_scale_xy: 0.4                 # Tỷ lệ scale ΔKp cho XY
+    fuzzy_ki_scale_xy: 0.1                 # Tỷ lệ scale ΔKi cho XY
+    fuzzy_kd_scale_xy: 0.05                # Tỷ lệ scale ΔKd cho XY
+
+    fuzzy_kp_scale_yaw: 0.3                # Tỷ lệ scale ΔKp cho yaw
+    fuzzy_ki_scale_yaw: 0.05               # Tỷ lệ scale ΔKi cho yaw
+    fuzzy_kd_scale_yaw: 0.05               # Tỷ lệ scale ΔKd cho yaw
+
+    fuzzy_7_width: 0.33                    # Độ rộng mỗi miền fuzzy (7 tập)
+
+
+    # ==========================
+    # Bảng luật fuzzy (7x7 = 49 phần tử)
+    # ==========================
+    fuzzy_rules_kp: [
+      0.7, 0.77, 0.83, 0.9, 0.83, 0.77, 0.7,
+      0.39, 0.46, 0.53, 0.59, 0.53, 0.46, 0.39,
+      0.1, 0.17, 0.23, 0.3, 0.23, 0.17, 0.1,
+     -0.2, -0.13, -0.07, 0.0, -0.07, -0.13, -0.2,
+      0.1, 0.17, 0.23, 0.3, 0.23, 0.17, 0.1,
+      0.39, 0.46, 0.53, 0.59, 0.53, 0.46, 0.39,
+      0.7, 0.77, 0.83, 0.9, 0.83, 0.77, 0.7
+    ]
+
+    fuzzy_rules_ki: [
+     -0.3, -0.2, -0.1, 0.0, -0.1, -0.2, -0.3,
+     -0.3, -0.13, 0.04, 0.2, 0.04, -0.13, -0.3,
+     -0.3, -0.06, 0.17, 0.4, 0.17, -0.06, -0.3,
+     -0.3, 0.01, 0.3, 0.6, 0.3, 0.01, -0.3,
+     -0.3, -0.06, 0.17, 0.4, 0.17, -0.06, -0.3,
+     -0.3, -0.13, 0.04, 0.2, 0.04, -0.13, -0.3,
+     -0.3, -0.2, -0.1, 0.0, -0.1, -0.2, -0.3
+    ]
+
+    fuzzy_rules_kd: [
+      0.9, 0.59, 0.3, 0.0, 0.3, 0.59, 0.9,
+      0.83, 0.53, 0.23, -0.07, 0.23, 0.53, 0.83,
+      0.77, 0.46, 0.16, -0.13, 0.16, 0.46, 0.77,
+      0.7, 0.39, 0.1, -0.2, 0.1, 0.39, 0.7,
+      0.77, 0.46, 0.16, -0.13, 0.16, 0.46, 0.77,
+      0.83, 0.53, 0.23, -0.07, 0.23, 0.53, 0.83,
+      0.9, 0.59, 0.3, 0.0, 0.3, 0.59, 0.9
+    ]
+
+
+    # ==========================
+    # Debug
+    # ==========================
+    publish_debug: true                    # Bật xuất debug
+    debug_topic_prefix: /pid_debug         # Prefix topic debug

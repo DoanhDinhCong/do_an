@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<library path="pid_controller">
+  <class name="clb_nav2_pid_controller/PidPathController"
+         type="clb_nav2_pid_controller::PidPathController"
+         base_class_type="nav2_core::Controller">
+    <description>PID path following controller for holonomic bases.</description>
+  </class>
+</library>

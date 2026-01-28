@@ -99,7 +99,7 @@ def generate_launch_description():
     
     # File cấu hình Nav2 (chứa parameters cho tất cả Nav2 nodes)
     # Bao gồm: controller, planner, behavior tree, recovery, v.v.
-    nav2_params = os.path.join(pkg_share, 'config', 'nav2_params.yaml')
+    nav2_params = os.path.join(pkg_share, 'config', 'RPP_nav2_params.yaml')
     
     # File bản đồ mặc định
     # Format: YAML với thông tin về file .pgm và metadata

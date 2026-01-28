@@ -37,7 +37,7 @@ def generate_launch_description():
                                                  # A2/A3: 256000
             
             # Frame configuration
-            'frame_id': 'lidar1_link',           # TF frame của LiDAR này
+            'frame_id': 'lidar_front',           # TF frame của LiDAR này
                                                  # Phải khớp với URDF!
             
             # Scan configuration
@@ -75,7 +75,7 @@ def generate_launch_description():
                                                  # ⚠️ Có thể đổi chỗ khi cắm lại!
                                                  
             'serial_baudrate': 115200,           # Baudrate giống LiDAR 1
-            'frame_id': 'lidar2_link',           # TF frame khác với LiDAR 1
+            'frame_id': 'lidar_rear',           # TF frame khác với LiDAR 1
             'angle_compensate': True,
             'scan_mode': 'Sensitivity',
             
